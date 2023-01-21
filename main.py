@@ -26,12 +26,23 @@ import vlc
 system("clear")
 
 
+class TittleBar(QFrame):
+    """
+        Custom TitleBar;
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
 class MainWindow(QMainWindow):
     """"""
 
     WIDTH = 380
     HEIGHT = 600
     TITLE = "Moziqa"
+
+    OPACITY = 0.94
 
     STYLESHEET = """
         
@@ -42,6 +53,11 @@ class MainWindow(QMainWindow):
 
         self.setFixedSize(MainWindow.WIDTH, MainWindow.HEIGHT)
         self.setWindowTitle(MainWindow.TITLE)
+        self.setWindowOpacity(MainWindow.OPACITY)
+        self.setWindowFlags(Qt.FramelessWindowHint)
+
+        # to make the main window transparent;
+        # self.setAttribute(Qt.WA_TranslucentBackground)
 
 
 def main():

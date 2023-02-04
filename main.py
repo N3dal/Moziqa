@@ -212,13 +212,19 @@ class MainFrame(QFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.root = self.parent()
 
-        self.setFixedSize(self.parent().width(), self.parent().height() - 37)
+        self.setFixedSize(self.parent().width(), self.root.height() - 37)
 
         self.setStyleSheet(MainFrame.STYLESHEET)
 
-        self.slide_menu = SlideMenu(parent=self)
-        self.slide_menu.move(0, 0)
+        # create the slide menu as last one,
+        # so it will appear on all the widgets;
+        self.slide_menu = SlideMenu(parent=self.root)
+        self.slide_menu.move(0, TitleBar.HEIGHT)
+
+        label = QLabel(parent=self, text="<h1>Long test text long one</h1>")
+        label.move(20, 180)
 
     def side_menu(self, slide_menu_status: bool):
         """
@@ -231,8 +237,13 @@ class MainFrame(QFrame):
         if slide_menu_status:
             self.slide_menu.animation_show()
 
+            # create blur effect;
+            blur_effect = QGraphicsBlurEffect(blurRadius=3)
+            self.setGraphicsEffect(blur_effect)
+
         else:
             self.slide_menu.animation_hide()
+            self.setGraphicsEffect(None)
 
         return None
 
@@ -244,6 +255,10 @@ class SlideMenu(QFrame):
 
     STYLESHEET = """
         background-color: #7e71a0;
+        border-top-left-radius: 0px;
+        border-top-right-radius: 10px;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
     """
 
     MAX_WIDTH = 210
@@ -257,7 +272,7 @@ class SlideMenu(QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setFixedSize(0, self.parent().height())
+        self.setFixedSize(0, self.parent().height() - 37)
         self.setStyleSheet(SlideMenu.STYLESHEET)
 
     def animation_show(self):

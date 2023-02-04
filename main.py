@@ -33,10 +33,23 @@ class Gif(QLabel):
         custom label that only show gifs;
     """
 
+    class Signals(QObject):
+        """
+            all Gif signals;
+        """
+
+        clicked = pyqtSignal()
+
     def __init__(self, path: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         self.path = path
 
+        self.signals = Gif.Signals()
+
+        self.animation_status = False
+
+        self.setAlignment(Qt.AlignCenter)
         self.__gif = QMovie(self.path)
 
         self.setMovie(self.__gif)
@@ -49,6 +62,7 @@ class Gif(QLabel):
         """
 
         self.__gif.start()
+        self.animation_status = True
 
         return None
 
@@ -60,6 +74,32 @@ class Gif(QLabel):
         """
 
         self.__gif.stop()
+        self.animation_status = False
+
+        return None
+
+    def show_picture(self):
+        """
+            show the first frame from the movie;
+
+            return None;
+        """
+
+        self.start()
+        self.stop()
+
+        return None
+
+    def mousePressEvent(self, e):
+        """
+            press event on the label;
+
+            return None;
+        """
+
+        if e.type() == 4:
+            # double click;
+            self.signals.clicked.emit()
 
         return None
 
@@ -245,7 +285,7 @@ class MainFrame(QFrame):
     """
 
     ALBUM_LOGO_STYLESHEET = """
-        background-color: #241f42;
+        background-color: #535066;
         border-radius: 10px;
     """
 
@@ -253,7 +293,7 @@ class MainFrame(QFrame):
         super().__init__(*args, **kwargs)
         self.root = self.parent()
 
-        self.setFixedSize(self.parent().width(), self.root.height() - 37)
+        self.setFixedSize(self.root.width(), self.root.height() - 37)
 
         self.setStyleSheet(MainFrame.STYLESHEET)
 
@@ -262,11 +302,14 @@ class MainFrame(QFrame):
         self.slide_menu = SlideMenu(parent=self.root)
         self.slide_menu.move(0, TitleBar.HEIGHT)
 
+        # create the default album logo;
         self.album_logo = Gif(
-            parent=self, path="./assets/gifs/music_anim.gif")
+            parent=self, path="./assets/gifs/music_anim2.gif")
+        self.album_logo.setFixedSize(320, 250)
         self.album_logo.setStyleSheet(MainFrame.ALBUM_LOGO_STYLESHEET)
-        self.album_logo.move(0, 20)
-        self.album_logo.start()
+        self.album_logo.show_picture()
+        self.album_logo.signals.clicked.connect(self.album_logo_click_event)
+        self.album_logo.move((self.width() - self.album_logo.width()) // 2, 50)
 
     def side_menu(self, slide_menu_status: bool):
         """
@@ -288,6 +331,21 @@ class MainFrame(QFrame):
 
             # remove the blur effect;
             self.setGraphicsEffect(None)
+
+        return None
+
+    def album_logo_click_event(self):
+        """
+            click event when click on the album logo;
+
+            return None;
+        """
+
+        if self.album_logo.animation_status:
+            self.album_logo.stop()
+
+        else:
+            self.album_logo.start()
 
         return None
 

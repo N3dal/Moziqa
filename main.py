@@ -28,6 +28,42 @@ import defaults
 system("clear")
 
 
+class Gif(QLabel):
+    """
+        custom label that only show gifs;
+    """
+
+    def __init__(self, path: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.path = path
+
+        self.__gif = QMovie(self.path)
+
+        self.setMovie(self.__gif)
+
+    def start(self):
+        """
+            start the animation;
+
+            return None;
+        """
+
+        self.__gif.start()
+
+        return None
+
+    def stop(self):
+        """
+            stop the animation;
+
+            return None;
+        """
+
+        self.__gif.stop()
+
+        return None
+
+
 class TitleBar(QFrame):
     """
            Custom Title bar for the Main window;
@@ -208,6 +244,11 @@ class MainFrame(QFrame):
 
     """
 
+    ALBUM_LOGO_STYLESHEET = """
+        background-color: #241f42;
+        border-radius: 10px;
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.root = self.parent()
@@ -221,8 +262,11 @@ class MainFrame(QFrame):
         self.slide_menu = SlideMenu(parent=self.root)
         self.slide_menu.move(0, TitleBar.HEIGHT)
 
-        label = QLabel(parent=self, text="<h1>Long test text long one</h1>")
-        label.move(20, 180)
+        self.album_logo = Gif(
+            parent=self, path="./assets/gifs/music_anim.gif")
+        self.album_logo.setStyleSheet(MainFrame.ALBUM_LOGO_STYLESHEET)
+        self.album_logo.move(0, 20)
+        self.album_logo.start()
 
     def side_menu(self, slide_menu_status: bool):
         """
@@ -241,6 +285,8 @@ class MainFrame(QFrame):
 
         else:
             self.slide_menu.animation_hide()
+
+            # remove the blur effect;
             self.setGraphicsEffect(None)
 
         return None

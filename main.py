@@ -356,7 +356,7 @@ class SlideMenu(QFrame):
     """
 
     STYLESHEET = """
-        background-color: #7e71a0;
+        background-color: #6c6785;
         border-top-left-radius: 0px;
         border-top-right-radius: 10px;
         border-bottom-left-radius: 10px;

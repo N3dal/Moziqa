@@ -28,7 +28,6 @@ import defaults
 system("clear")
 
 
-
 class TitleBar(QFrame):
     """
            Custom Title bar for the Main window;
@@ -262,6 +261,7 @@ class SlideMenu(QFrame):
 
     MAX_WIDTH = 210
     MIN_WIDTH = 0
+    ANIMATION_DURATION = 150
 
     class Signals(QObject):
         """
@@ -272,12 +272,13 @@ class SlideMenu(QFrame):
         super().__init__(*args, **kwargs)
         self.root = self.parent()
 
-        self.setGeometry(0, 0, 0, self.root.height() - TitleBar.HEIGHT)
+        self.setGeometry(0, TitleBar.HEIGHT, 0,
+                         self.root.height() - TitleBar.HEIGHT - 3)
         self.setStyleSheet(SlideMenu.STYLESHEET)
 
         # show animation;
         self.show_animation = QPropertyAnimation(self, b"geometry")
-        self.show_animation.setDuration(150)
+        self.show_animation.setDuration(SlideMenu.ANIMATION_DURATION)
         self.show_animation.setStartValue(
             QRect(0, TitleBar.HEIGHT, 0, self.height()))
         self.show_animation.setEndValue(
@@ -285,7 +286,7 @@ class SlideMenu(QFrame):
 
         # hide animation;
         self.hide_animation = QPropertyAnimation(self, b"geometry")
-        self.hide_animation.setDuration(150)
+        self.hide_animation.setDuration(SlideMenu.ANIMATION_DURATION)
         self.hide_animation.setStartValue(
             QRect(0, TitleBar.HEIGHT, SlideMenu.MAX_WIDTH, self.height()))
         self.hide_animation.setEndValue(

@@ -60,6 +60,14 @@ class TitleBar(QFrame):
         }
     """
 
+    class Signals(QObject):
+        """
+            all title bar signals;
+        """
+
+        option_btn_clicked = pyqtSignal()
+        menu_btn_clicked = pyqtSignal()
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -69,19 +77,21 @@ class TitleBar(QFrame):
 
         self.old_mouse_position = QPoint()
 
+        self.signals = TitleBar.Signals()
+
         # create the menu button;
         self.menu_btn = QPushButton(parent=self)
         self.menu_btn.setFixedSize(34, 34)
         self.menu_btn.setIcon(QIcon("./assets/pictures/menu.png"))
         self.menu_btn.setIconSize(QSize(24, 24))
-        # self.menu_btn.clicked.connect(self.parent().showMinimized)
+        self.menu_btn.clicked.connect(self.__menu_btn_event)
         self.menu_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.menu_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
         self.menu_btn.move(0, 0)
 
         # create the icon;
         self.icon = QPushButton(parent=self)
-        self.icon.setIcon(QIcon("./assets/pictures/icon.png"))
+        self.icon.setIcon(QIcon(defaults.ICON))
         self.icon.setIconSize(QSize(24, 24))
         # self.icon.clicked.connect(self.parent().showMinimized)
         self.icon.setCursor(QCursor(Qt.PointingHandCursor))
@@ -115,7 +125,7 @@ class TitleBar(QFrame):
         self.more_option_btn = QPushButton(parent=self)
         self.more_option_btn.setIcon(QIcon("./assets/pictures/options.png"))
         self.more_option_btn.setIconSize(QSize(24, 24))
-        # self.more_option_btn.clicked.connect(self.parent().showMinimized)
+        self.more_option_btn.clicked.connect(self.__more_option_btn_event)
         self.more_option_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.more_option_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
         self.more_option_btn.move(self.width() - 90, 5)
@@ -140,6 +150,28 @@ class TitleBar(QFrame):
 
         self.parent().move(self.parent().x() + delta.x(), self.parent().y() + delta.y())
         self.old_mouse_position = e.globalPos()
+
+        return None
+
+    def __more_option_btn_event(self):
+        """
+            event when more option button clicked;
+
+            return None;
+        """
+
+        self.signals.option_btn_clicked.emit()
+
+        return None
+
+    def __menu_btn_event(self):
+        """
+            event when menu button clicked;
+
+            return None;
+        """
+
+        self.signals.menu_btn_clicked.emit()
 
         return None
 
@@ -185,6 +217,7 @@ class MainWindow(QMainWindow):
 
         self.setFixedSize(MainWindow.WIDTH, MainWindow.HEIGHT)
         self.setWindowOpacity(MainWindow.OPACITY)
+        self.setWindowIcon(QIcon(defaults.ICON))
         self.setWindowFlags(Qt.FramelessWindowHint)
 
         # to make the main window transparent;
@@ -195,6 +228,12 @@ class MainWindow(QMainWindow):
 
         self.main_frame = MainFrame(parent=self)
         self.main_frame.move(0, TitleBar.HEIGHT)
+
+        self.title_bar.signals.menu_btn_clicked.connect(
+            lambda: print("menu clicked!!"))
+
+        self.title_bar.signals.option_btn_clicked.connect(
+            lambda: print("option clicked!!"))
 
 
 def main():

@@ -85,13 +85,13 @@ class TitleBar(QFrame):
         self.icon.setIconSize(QSize(24, 24))
         # self.icon.clicked.connect(self.parent().showMinimized)
         self.icon.setCursor(QCursor(Qt.PointingHandCursor))
-        self.icon.move(45, 3)
+        self.icon.move(135, 5)
 
         # create the title label;
         self.title_label = QLabel(
             parent=self, text=f"<h3>{defaults.TITLE}</h3>")
         self.title_label.setStyleSheet(TitleBar.LABEL_STYLESHEET)
-        self.title_label.move(80, 7)
+        self.title_label.move(170, 7)
 
         # create the close button;
         self.close_btn = QPushButton(parent=self)

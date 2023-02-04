@@ -110,30 +110,33 @@ class TitleBar(QFrame):
 
         # create the close button;
         self.close_btn = QPushButton(parent=self)
+        self.close_btn.setFixedSize(30, 30)
         self.close_btn.setIcon(QIcon("./assets/pictures/close.png"))
         self.close_btn.setIconSize(QSize(24, 24))
         self.close_btn.clicked.connect(sys.exit)
         self.close_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.close_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
-        self.close_btn.move(self.width() - 30, 5)
+        self.close_btn.move(self.width() - 30, 2)
 
         # create the minimize button;
         self.minimize_btn = QPushButton(parent=self)
+        self.minimize_btn.setFixedSize(30, 30)
         self.minimize_btn.setIcon(QIcon("./assets/pictures/minimize.png"))
         self.minimize_btn.setIconSize(QSize(24, 24))
         self.minimize_btn.clicked.connect(self.parent().showMinimized)
         self.minimize_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.minimize_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
-        self.minimize_btn.move(self.width() - 60, 5)
+        self.minimize_btn.move(self.width() - 60, 2)
 
         # create the more-option button;
         self.more_option_btn = QPushButton(parent=self)
-        self.more_option_btn.setIcon(QIcon("./assets/pictures/options.png"))
+        self.more_option_btn.setFixedSize(30, 30)
+        self.more_option_btn.setIcon(QIcon("./assets/pictures/more.png"))
         self.more_option_btn.setIconSize(QSize(24, 24))
         self.more_option_btn.clicked.connect(self.__more_option_btn_event)
         self.more_option_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.more_option_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
-        self.more_option_btn.move(self.width() - 90, 5)
+        self.more_option_btn.move(self.width() - 90, 2)
 
     def mousePressEvent(self, e):
 

@@ -27,7 +27,6 @@ import defaults
 # wipe terminal screen;
 system("clear")
 
-# TODO: add animation to slide menu when its show and when its hide;
 
 
 class TitleBar(QFrame):
@@ -271,9 +270,26 @@ class SlideMenu(QFrame):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.root = self.parent()
 
-        self.setFixedSize(0, self.parent().height() - 37)
+        self.setGeometry(0, 0, 0, self.root.height() - TitleBar.HEIGHT)
         self.setStyleSheet(SlideMenu.STYLESHEET)
+
+        # show animation;
+        self.show_animation = QPropertyAnimation(self, b"geometry")
+        self.show_animation.setDuration(150)
+        self.show_animation.setStartValue(
+            QRect(0, TitleBar.HEIGHT, 0, self.height()))
+        self.show_animation.setEndValue(
+            QRect(0, TitleBar.HEIGHT, SlideMenu.MAX_WIDTH, self.height()))
+
+        # hide animation;
+        self.hide_animation = QPropertyAnimation(self, b"geometry")
+        self.hide_animation.setDuration(150)
+        self.hide_animation.setStartValue(
+            QRect(0, TitleBar.HEIGHT, SlideMenu.MAX_WIDTH, self.height()))
+        self.hide_animation.setEndValue(
+            QRect(0, TitleBar.HEIGHT, 0, self.height()))
 
     def animation_show(self):
         """
@@ -282,7 +298,7 @@ class SlideMenu(QFrame):
             return None;
         """
 
-        self.setFixedWidth(SlideMenu.MAX_WIDTH)
+        self.show_animation.start()
 
         return None
 
@@ -293,7 +309,7 @@ class SlideMenu(QFrame):
             return None;
         """
 
-        self.setFixedWidth(SlideMenu.MIN_WIDTH)
+        self.hide_animation.start()
 
         return None
 

@@ -15,6 +15,7 @@
 
 from os import (system, listdir)
 from os.path import exists
+from time import sleep
 import sys
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -25,6 +26,8 @@ import defaults
 
 # wipe terminal screen;
 system("clear")
+
+# TODO: add animation to slide menu when its show and when its hide;
 
 
 class TitleBar(QFrame):
@@ -54,7 +57,7 @@ class TitleBar(QFrame):
         QPushButton{
             border-radius: 5px;
         }
-        
+
         QPushButton:hover{
             background-color: #d8e1ee;
         }
@@ -66,7 +69,7 @@ class TitleBar(QFrame):
         """
 
         option_btn_clicked = pyqtSignal()
-        menu_btn_clicked = pyqtSignal()
+        menu_btn_clicked = pyqtSignal(bool)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -80,10 +83,12 @@ class TitleBar(QFrame):
         self.signals = TitleBar.Signals()
 
         # create the menu button;
+        # to indicate the menu_button is active or not;
+        self.menu_btn_status = False
         self.menu_btn = QPushButton(parent=self)
         self.menu_btn.setFixedSize(34, 34)
         self.menu_btn.setIcon(QIcon("./assets/pictures/menu.png"))
-        self.menu_btn.setIconSize(QSize(24, 24))
+        # self.menu_btn.setIconSize(QSize(24, 24))
         self.menu_btn.clicked.connect(self.__menu_btn_event)
         self.menu_btn.setCursor(QCursor(Qt.PointingHandCursor))
         self.menu_btn.setStyleSheet(TitleBar.BUTTON_STYLESHEET)
@@ -171,7 +176,17 @@ class TitleBar(QFrame):
             return None;
         """
 
-        self.signals.menu_btn_clicked.emit()
+        if self.menu_btn_status:
+            # if the button is active;
+            self.menu_btn.setIcon(QIcon("./assets/pictures/menu.png"))
+            self.menu_btn_status = False
+
+        else:
+            # if the button is not active;
+            self.menu_btn.setIcon(QIcon("./assets/pictures/back.png"))
+            self.menu_btn_status = True
+
+        self.signals.menu_btn_clicked.emit(self.menu_btn_status)
 
         return None
 
@@ -183,13 +198,13 @@ class MainFrame(QFrame):
     """
 
     STYLESHEET = """
-        
-        background-color: #282828;
+
+        background-color: #3e3b4e;
         border-top-left-radius: 0px;
         border-top-right-radius:0px;
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
-        
+
     """
 
     def __init__(self, *args, **kwargs):
@@ -198,6 +213,71 @@ class MainFrame(QFrame):
         self.setFixedSize(self.parent().width(), self.parent().height() - 37)
 
         self.setStyleSheet(MainFrame.STYLESHEET)
+
+        self.slide_menu = SlideMenu(parent=self)
+        self.slide_menu.move(0, 0)
+
+    def side_menu(self, slide_menu_status: bool):
+        """
+            show the side menu;
+            and blur the content;
+
+            return None;
+        """
+
+        if slide_menu_status:
+            self.slide_menu.animation_show()
+
+        else:
+            self.slide_menu.animation_hide()
+
+        return None
+
+
+class SlideMenu(QFrame):
+    """
+        slide menu that appear when we click on menu button;
+    """
+
+    STYLESHEET = """
+        background-color: #7e71a0;
+    """
+
+    MAX_WIDTH = 210
+    MIN_WIDTH = 0
+
+    class Signals(QObject):
+        """
+            all slide menu signals;
+        """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setFixedSize(0, self.parent().height())
+        self.setStyleSheet(SlideMenu.STYLESHEET)
+
+    def animation_show(self):
+        """
+            show the Slide Menu with animation;
+
+            return None;
+        """
+
+        self.setFixedWidth(SlideMenu.MAX_WIDTH)
+
+        return None
+
+    def animation_hide(self):
+        """
+            hide the Slide Menu with animation;
+
+            return None;
+        """
+
+        self.setFixedWidth(SlideMenu.MIN_WIDTH)
+
+        return None
 
 
 class MainWindow(QMainWindow):
@@ -230,10 +310,7 @@ class MainWindow(QMainWindow):
         self.main_frame.move(0, TitleBar.HEIGHT)
 
         self.title_bar.signals.menu_btn_clicked.connect(
-            lambda: print("menu clicked!!"))
-
-        self.title_bar.signals.option_btn_clicked.connect(
-            lambda: print("option clicked!!"))
+            self.main_frame.side_menu)
 
 
 def main():

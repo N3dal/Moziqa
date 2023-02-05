@@ -104,6 +104,10 @@ class Gif(QLabel):
         return None
 
 
+class MusicControl(QFrame):
+    """"""
+
+
 class TitleBar(QFrame):
     """
            Custom Title bar for the Main window;
@@ -144,6 +148,7 @@ class TitleBar(QFrame):
 
         option_btn_clicked = pyqtSignal()
         menu_btn_clicked = pyqtSignal(bool)
+        icon_clicked = pyqtSignal()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -172,7 +177,7 @@ class TitleBar(QFrame):
         self.icon = QPushButton(parent=self)
         self.icon.setIcon(QIcon(defaults.ICON))
         self.icon.setIconSize(QSize(24, 24))
-        # self.icon.clicked.connect(self.parent().showMinimized)
+        self.icon.clicked.connect(self.__icon_btn_event)
         self.icon.setCursor(QCursor(Qt.PointingHandCursor))
         self.icon.move(135, 5)
 
@@ -264,6 +269,17 @@ class TitleBar(QFrame):
             self.menu_btn_status = True
 
         self.signals.menu_btn_clicked.emit(self.menu_btn_status)
+
+        return None
+
+    def __icon_btn_event(self):
+        """
+            event when we click on the icon;
+
+            return None;
+        """
+
+        self.signals.icon_clicked.emit()
 
         return None
 
@@ -446,10 +462,11 @@ class MainWindow(QMainWindow):
         self.title_bar.move(0, 0)
 
         self.main_frame = MainFrame(parent=self)
-        self.main_frame.move(0, TitleBar.HEIGHT)
+        self.main_frame.move(0, TitleBar.HEIGHT - 1)
 
         self.title_bar.signals.menu_btn_clicked.connect(
             self.main_frame.side_menu)
+        self.title_bar.signals.icon_clicked.connect(self.main_frame.album_logo_click_event)
 
 
 def main():

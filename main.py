@@ -107,6 +107,152 @@ class Gif(QLabel):
 class MusicControl(QFrame):
     """"""
 
+    WIDTH = 330
+    HEIGHT = 60
+
+    STYLESHEET = """
+            background-color: #535066;
+            border-radius: 10px;
+        
+    """
+
+    BUTTON_STYLESHEET = """
+        QPushButton{
+            border-radius: 16px;
+        }
+        
+        QPushButton:hover{
+            background-color: #3e3b4e;
+            
+        }        
+    """
+
+    class Signals(QObject):
+        """
+            all signals for music control;
+        """
+
+        previous_clicked = pyqtSignal()
+        play_control_clicked = pyqtSignal(bool)
+        next_clicked = pyqtSignal()
+        repeat_clicked = pyqtSignal(bool)
+        sound_clicked = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.setFixedSize(MusicControl.WIDTH, MusicControl.HEIGHT)
+        self.setStyleSheet(MusicControl.STYLESHEET)
+
+        self.signals = MusicControl.Signals()
+
+        self.__play_state = False
+        self.__repeat_state = False
+
+        self.play_btn = QPushButton(parent=self)
+        self.play_btn.setFixedSize(32, 32)
+        self.play_btn.setStyleSheet(MusicControl.BUTTON_STYLESHEET)
+        self.play_btn.clicked.connect(self.__play_btn_event)
+        self.play_btn.setIcon(QIcon("./assets/pictures/play.png"))
+        self.play_btn.setIconSize(QSize(32, 32))
+        self.play_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.play_btn.move(
+            (self.width() - self.play_btn.width()) // 2, (self.height() - self.play_btn.height()) // 2)
+
+        self.previous_btn = QPushButton(parent=self)
+        self.previous_btn.setFixedSize(32, 32)
+        self.previous_btn.setStyleSheet(MusicControl.BUTTON_STYLESHEET)
+        self.previous_btn.setIcon(QIcon("./assets/pictures/previous.png"))
+        self.previous_btn.setIconSize(QSize(32, 32))
+        self.previous_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.previous_btn.move(
+            self.play_btn.x() - 70, (self.height() - self.previous_btn.height()) // 2)
+
+        self.next_btn = QPushButton(parent=self)
+        self.next_btn.setFixedSize(32, 32)
+        self.next_btn.setStyleSheet(MusicControl.BUTTON_STYLESHEET)
+        self.next_btn.setIcon(QIcon("./assets/pictures/next.png"))
+        self.next_btn.setIconSize(QSize(32, 32))
+        self.next_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.next_btn.move(
+            self.play_btn.x() + 70, (self.height() - self.next_btn.height()) // 2)
+
+        self.repeat_btn = QPushButton(parent=self)
+        self.repeat_btn.setFixedSize(32, 32)
+        self.repeat_btn.setStyleSheet(MusicControl.BUTTON_STYLESHEET)
+        self.repeat_btn.clicked.connect(self.__repeat_btn_event)
+        self.repeat_btn.setIcon(QIcon("./assets/pictures/repeat_diactive.png"))
+        self.repeat_btn.setIconSize(QSize(32, 32))
+        self.repeat_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.repeat_btn.move(self.play_btn.x() - 120,
+                             (self.height() - self.repeat_btn.height()) // 2)
+
+        self.volume_btn = QPushButton(parent=self)
+        self.volume_btn.setFixedSize(32, 32)
+        self.volume_btn.setStyleSheet(MusicControl.BUTTON_STYLESHEET)
+        self.volume_btn.setIcon(QIcon("./assets/pictures/volume.png"))
+        self.volume_btn.setIconSize(QSize(32, 32))
+        self.volume_btn.setCursor(QCursor(Qt.PointingHandCursor))
+        self.volume_btn.move(self.play_btn.x() + 120,
+                             (self.height() - self.volume_btn.height()) // 2)
+
+    @property
+    def play_state(self):
+        return self.__play_state
+
+    @property
+    def repeat_state(self):
+        return self.__repeat_state
+
+    def __repeat_btn_event(self):
+        """
+            event when we click on repeat button;
+
+            return None;
+        """
+
+        if self.repeat_state:
+            self.repeat_btn.setIcon(
+                QIcon("./assets/pictures/repeat_diactive.png"))
+            self.__repeat_state = False
+
+        else:
+            self.repeat_btn.setIcon(
+                QIcon("./assets/pictures/repeat_active.png"))
+            self.__repeat_state = True
+
+        self.signals.repeat_clicked.emit(self.repeat_state)
+
+        return None
+
+    def __play_btn_event(self):
+        """
+            event when we click on play button;
+
+            return None;
+        """
+
+        if self.play_state:
+            self.play_btn.setIcon(QIcon("./assets/pictures/play.png"))
+            self.__play_state = False
+
+        else:
+            self.play_btn.setIcon(QIcon("./assets/pictures/pause.png"))
+            self.__play_state = True
+
+        self.signals.play_control_clicked.emit(self.play_state)
+
+        return None
+
+    def __previous_btn_event(self):
+        """"""
+
+    def __next_btn_event(self):
+        """"""
+
+    def __volume_btn_event(self):
+        """"""
+
 
 class TitleBar(QFrame):
     """
@@ -305,6 +451,11 @@ class MainFrame(QFrame):
         border-radius: 10px;
     """
 
+    SONG_LABEL_STYLESHEET = """
+        border-radius: 10px;
+        font-size: 22px;
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.root = self.parent()
@@ -324,8 +475,22 @@ class MainFrame(QFrame):
         self.album_logo.setFixedSize(320, 250)
         self.album_logo.setStyleSheet(MainFrame.ALBUM_LOGO_STYLESHEET)
         self.album_logo.show_picture()
-        self.album_logo.signals.clicked.connect(self.album_logo_click_event)
         self.album_logo.move((self.width() - self.album_logo.width()) // 2, 50)
+
+        # create the song name label;
+        self.song_name_label = QLabel(
+            parent=self, text="Long Text Just For testing!")
+        self.song_name_label.setFixedSize(self.width(), 40)
+        self.song_name_label.setStyleSheet(MainFrame.SONG_LABEL_STYLESHEET)
+        self.song_name_label.setAlignment(Qt.AlignCenter)
+        self.song_name_label.move(0, 330)
+
+        # create the music control;
+        self.music_control = MusicControl(parent=self)
+        self.music_control.signals.play_control_clicked.connect(
+            self.album_logo_animation)
+        self.music_control.move(
+            (self.width() - self.music_control.width()) // 2, 390)
 
     def side_menu(self, slide_menu_status: bool):
         """
@@ -350,14 +515,14 @@ class MainFrame(QFrame):
 
         return None
 
-    def album_logo_click_event(self):
+    def album_logo_animation(self, btn_state: bool):
         """
             click event when click on the album logo;
 
             return None;
         """
 
-        if self.album_logo.animation_status:
+        if self.album_logo.animation_status or not btn_state:
             self.album_logo.stop()
 
         else:
@@ -466,7 +631,6 @@ class MainWindow(QMainWindow):
 
         self.title_bar.signals.menu_btn_clicked.connect(
             self.main_frame.side_menu)
-        self.title_bar.signals.icon_clicked.connect(self.main_frame.album_logo_click_event)
 
 
 def main():

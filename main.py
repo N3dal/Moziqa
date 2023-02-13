@@ -430,6 +430,63 @@ class TitleBar(QFrame):
         return None
 
 
+class SongNameLabel(QLabel):
+    """
+        Custom Label for viewing songs names;
+    """
+
+    HEIGHT = 80
+
+    STYLESHEET = """
+        border-radius: 10px;
+        font-size: 22px;
+        color: #fafafa;
+    """
+
+    MAX_LENGTH = 28
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.root = self.parent()
+
+        self.setFixedSize(self.root.width() - 20, SongNameLabel.HEIGHT)
+
+        # self.setAlignment(Qt.AlignCenter)
+
+        self.__full_name = None
+
+        self.setStyleSheet(SongNameLabel.STYLESHEET)
+
+    def set_name(self, name: str):
+        """
+            set the song name on the label;
+
+            return None;
+        """
+
+        self.__full_name = name
+
+        short_name = "[" + \
+            name[:SongNameLabel.MAX_LENGTH].center(
+                SongNameLabel.MAX_LENGTH) + "]"
+
+        self.setText(short_name)
+
+        return None
+
+    def move_text_to_left(self, text: str):
+        """
+            move the text name to left;
+
+            return None;
+        """
+        # [ full name string here ]
+        # [   full name string   ]
+
+        return "".join(char for char in text[1:])
+
+
 class MainFrame(QFrame):
     """
         The main frame that will hold everything;
@@ -478,19 +535,17 @@ class MainFrame(QFrame):
         self.album_logo.move((self.width() - self.album_logo.width()) // 2, 50)
 
         # create the song name label;
-        self.song_name_label = QLabel(
-            parent=self, text="Long Text Just For testing!")
-        self.song_name_label.setFixedSize(self.width(), 40)
-        self.song_name_label.setStyleSheet(MainFrame.SONG_LABEL_STYLESHEET)
-        self.song_name_label.setAlignment(Qt.AlignCenter)
-        self.song_name_label.move(0, 330)
+        self.song_name_label = SongNameLabel(parent=self)
+        self.song_name_label.set_name(
+            "Amazing Work Music by nothing except nothing too dude!?#j")
+        self.song_name_label.move(10, 330)
 
         # create the music control;
         self.music_control = MusicControl(parent=self)
         self.music_control.signals.play_control_clicked.connect(
             self.album_logo_animation)
         self.music_control.move(
-            (self.width() - self.music_control.width()) // 2, 390)
+            (self.width() - self.music_control.width()) // 2, self.height() - self.music_control.height() - 20)
 
     def side_menu(self, slide_menu_status: bool):
         """
